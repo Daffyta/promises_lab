@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="static/materialize-css/dist/css/materialize.min.css">
+    <link rel="stylesheet" href="static/css/main.css">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="navbar-fixed">
+        <nav class="nav-extended blue darken-3">
+            <div class="nav-wrapper">
+                <a href="#!" class="brand-logo left ml">Exoplanet Explorer</a>
+            </div>
+            <div class="nav-content">
+                <p class="left ml">Lee mas acerca de otros planetas</p>
+            </div>
+        </nav>
+    </div>
+    <h1 class="title center">Planetas</h1>
+    <section id="contenedor">
+
+
+    </section>
+
+    <script>
+        function getJSON(url) {
+            return new Promise(function(resolve, reject) {
+                var ajax = new XMLHttpRequest();
+                ajax.open("GET", url);
+                ajax.send();
+                ajax.onreadystatechange = function() {
+                    if (ajax.readyState == 4) {
+                        resolve(JSON.parse(ajax.responseText));
+                    }
+                }
+            })
+        }
+
+        getJSON('data/earth-like-results.json')
+
+            .then(function(response) {
+                var arrayPlanets = (response.results.map(function(url) {
+                    return getJSON(url);
+                }));
+                return Promise.all(arrayPlanets);
+                console.log(arrayPlanets);
+            })
+
+            .then(function(arreglo) { //se hace en funcion para q la sincronia no se rompa
+                arreglo.forEach(function(planetas){
+                  var contenedor = document.getElementById('contenedor');
+                  var nombre = planetas.pl_name;
+                  var masa = planetas.pl_masse;
+                  var year = planetas.pl_disc;
+                  var telescopio = planetas.pl_telescope;
+                  plantillaFinal = plantilla.replace("__name__", nombre)
+                      .replace("__masa__", masa)
+                      .replace("__year__", year)
+                      .replace("__telescope__", telescopio);
+                  contenedor.innerHTML += plantillaFinal;
+                });
+
+
+            });
+
+        //
+        // function mostrarPlaneta(planetas) {
+        //     var contenedor = document.getElementById('contenedor');
+        //     var nombre = planetas.pl_name;
+        //     var masa = planetas.pl_masse;
+        //     var year = planetas.pl_disc;
+        //     var telescopio = planetas.pl_telescope;
+        //     plantillaFinal = plantilla.replace("__name__", nombre)
+        //         .replace("__masa__", masa)
+        //         .replace("__year__", year)
+        //         .replace("__telescope__", telescopio);
+        //     contenedor.innerHTML += plantillaFinal;
+        // };
+
+
+        var plantilla = '<div class="container mt">' +
+            '<div class="row">' +
+            '<div class="col s12 m9 offset-m1">' +
+            '<div class="card horizontal">' +
+            '<div class="card-image">' +
+            '<img src="http://www.elchaco.info/wp-content/uploads/2017/06/planetas-300x300.jpg">' +
+            '</div>' +
+            '<div class="card-stacked">' +
+            '<div class="card-content">' +
+            '<h3>__name__</h3>' +
+            '<br>' +
+            '<p> Tiene una masa de: __masa__ </p>' +
+            '<br>' +
+            '<p>Descubierta en el año: __year__  con  __telescope__</p>' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '</div>';
+    </script>
+</body>
+
+</html>
